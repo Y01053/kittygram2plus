@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'djoser',
     'cats.apps.CatsConfig',
 ]
@@ -130,10 +131,28 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated', 
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        # Класс для описания собственного лимита (scope)
+        'rest_framework.throttling.ScopedRateThrottle',
+        # 'rest_framework.throttling.AnonRateThrottle',
+        # Не будем подключать класс AnonRateThrottle глобально.
+        # Подключим его только в тех view-классах или вьюсетах,
+        # где надо установить лимиты для анонимов
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        # Но сами лимиты установим, и они будут доступны из всего кода проекта
+        'user': '10000/day',  # Лимит для UserRateThrottle
+        'anon': '1000/day',  # Лимит для AnonRateThrottle
+        # Имена (ключи) для scope придумывает разработчик, 
+        # в меру собственной фантазии
+        'low_request': '1/minute',
+    },
+    'DEFAULT_PAGINATION_CLASS': 'cats.pagination.CatsPagination',
+    'PAGE_SIZE': 5,
 }
 
 SIMPLE_JWT = {
